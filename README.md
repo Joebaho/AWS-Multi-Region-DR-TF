@@ -1,5 +1,7 @@
 # Automated Multi-Region Disaster Recovery on AWS
 
+![Achitecture](images/achitecture.png)
+
 This Terraform project implements a fully automated DR system that uses CloudWatch, SNS, Lambda, and Route 53 to switch traffic to a secondary region automatically when the primary region becomes unhealthy.
 
 ## Architecture
