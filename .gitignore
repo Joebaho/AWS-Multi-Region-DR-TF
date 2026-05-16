@@ -7,4 +7,5 @@ crash.log
 crash.*.log
 lambda_function.zip
 terraform.tfvars
+*.auto.tfvars
 .terraform.lock.hcl
