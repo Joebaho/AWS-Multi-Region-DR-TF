@@ -1,0 +1,5 @@
+hosted_zone_name = "neatfleets-services.com"
+record_name      = "dr.neatfleets-services.com"
+instance_type    = "t3.micro"
+primary_key_name = "ansible-key"
+dr_key_name      = "london-key-pair"
