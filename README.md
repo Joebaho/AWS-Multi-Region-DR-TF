@@ -36,7 +36,7 @@ record_name        = "dr.neatfleets-services.com"
 instance_type      = "t3.micro"
 primary_key_name   = "ansible-key"
 dr_key_name        = "london-key-pair"
-# notification_email = "you@example.com"
+notification_email = "joseph.mbatchou.aus@gmail.com"
 
 # Optional. If omitted, instances launch without SSH keys.
 # key_name         = "shared-key-name"
@@ -154,4 +154,3 @@ Pull requests are welcome. For major changes, please open an issue first.
 ## 📄 License
 
 This project is licensed under the MIT License — see the LICENSE file for details.
-
