@@ -127,7 +127,7 @@ resource "aws_autoscaling_group" "primary" {
   provider = aws.primary
   name     = "dr-primary-asg"
 
-  min_size          = 2
+  min_size          = 0
   max_size          = 4
   desired_capacity  = 2
   health_check_type = "ELB"

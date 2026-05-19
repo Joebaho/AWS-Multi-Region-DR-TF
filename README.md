@@ -57,6 +57,50 @@ terraform apply "tfplan"
 
 After apply, confirm the primary ALB output and `record_name` respond, then test failover by forcing the primary target group unhealthy or setting the primary ASG desired capacity to zero. The CloudWatch alarm should publish to SNS, invoke Lambda, scale the DR ASG up, and update the Route 53 A alias record to the DR ALB.
 
+## Test failover with AWS CLI
+
+After `terraform apply`, the app starts in `us-west-2` with two primary EC2 instances. The DR Auto Scaling Group in `eu-west-2` is created with `desired_capacity = 0`, so no DR web instances run until failover.
+
+Confirm the normal state:
+
+```bash
+terraform output app_url
+terraform output primary_asg_name
+terraform output dr_asg_name
+```
+
+Trigger failover by reducing the primary ASG to zero:
+
+```bash
+aws autoscaling set-desired-capacity \
+  --region us-west-2 \
+  --auto-scaling-group-name "$(terraform output -raw primary_asg_name)" \
+  --desired-capacity 0
+```
+
+Watch the CloudWatch alarm move to `ALARM`:
+
+```bash
+aws cloudwatch describe-alarms \
+  --region us-west-2 \
+  --alarm-names "$(terraform output -raw primary_health_alarm_name)" \
+  --query 'MetricAlarms[0].StateValue' \
+  --output text
+```
+
+When the alarm triggers, SNS invokes Lambda. Lambda scales the DR ASG in `eu-west-2` from 0 to 2, waits for healthy DR targets, updates Route 53 to the DR ALB, then sends the email notification.
+
+Check the DR ASG after failover:
+
+```bash
+aws autoscaling describe-auto-scaling-groups \
+  --region eu-west-2 \
+  --auto-scaling-group-names "$(terraform output -raw dr_asg_name)" \
+  --query 'AutoScalingGroups[0].{Desired:DesiredCapacity,Min:MinSize,Instances:length(Instances)}'
+```
+
+Important: Terraform creates the standby DR network, ALB, target group, and ASG during `terraform apply`. The EC2 web instances in `eu-west-2` are what launch only after the alarm-driven failover.
+
 This project builds an automated multi-region disaster recovery setup on AWS. It creates a normal “primary” web stack in us-west-2, a standby disaster recovery stack in eu-west-2, and automation resources in ca-central-1.
 
 - **Normal State**
