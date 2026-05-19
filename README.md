@@ -69,12 +69,13 @@ terraform output primary_asg_name
 terraform output dr_asg_name
 ```
 
-Trigger failover by reducing the primary ASG to zero:
+Trigger failover by reducing the primary ASG minimum and desired capacity to zero:
 
 ```bash
-aws autoscaling set-desired-capacity \
+aws autoscaling update-auto-scaling-group \
   --region us-west-2 \
   --auto-scaling-group-name "$(terraform output -raw primary_asg_name)" \
+  --min-size 0 \
   --desired-capacity 0
 ```
 
